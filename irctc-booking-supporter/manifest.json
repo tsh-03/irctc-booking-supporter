@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "IRCTC Booking Supporter",
+  "version": "1.0",
+  "description": "Speed up IRCTC train bookings - especially tatkal tickets with auto-fill and smart navigation",
+  
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting"
+  ],
+  
+  "host_permissions": [
+    "*://www.irctc.co.in/*",
+    "*://connect.irctc.co.in/*"
+  ],
+  
+  "background": {
+    "service_worker": "background.js"
+  },
+  
+  "content_scripts": [
+    {
+      "matches": ["*://www.irctc.co.in/*", "*://connect.irctc.co.in/*"],
+      "js": ["content.js"]
+    }
+  ],
+  
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "IRCTC Helper"
+  }
+}

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      width: 350px;
+      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      position: relative;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+      cursor: move;
+      user-select: none;
+      padding: 10px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .header:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+    
+    .header h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    .header p {
+      margin: 5px 0 0 0;
+      opacity: 0.8;
+      font-size: 12px;
+    }
+    
+    .section {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+      backdrop-filter: blur(10px);
+    }
+    
+    .section h3 {
+      margin: 0 0 10px 0;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    
+    .form-group {
+      margin-bottom: 12px;
+    }
+    
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      margin-bottom: 4px;
+      opacity: 0.9;
+    }
+    
+    .required {
+      color: white;
+      font-weight: bold;
+    }
+    
+    .status {
+      padding: 8px 12px;
+      border-radius: 4px;
+      margin-bottom: 15px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .status.success {
+      background: rgba(72, 187, 120, 0.2);
+      border: 1px solid rgba(72, 187, 120, 0.4);
+      color: white;
+    }
+    
+    .status.error {
+      background: rgba(245, 101, 101, 0.2);
+      border: 1px solid rgba(245, 101, 101, 0.4);
+      color: white;
+    }
+    
+    .status.active {
+      background: rgba(99, 179, 237, 0.2);
+      border: 1px solid rgba(99, 179, 237, 0.4);
+      color: white;
+    }
+    
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 8px;
+      border: none;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      font-size: 12px;
+      box-sizing: border-box;
+    }
+    
+    .form-group input::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .passenger-item {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 8px;
+      position: relative;
+    }
+    
+    .passenger-header {
+      display: flex;
+      justify-content: between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    
+    .passenger-number {
+      font-weight: 600;
+      font-size: 12px;
+    }
+    
+    .remove-passenger {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 10px;
+      cursor: pointer;
+      margin-left: auto;
+    }
+    
+    .btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+      transition: background 0.2s;
+      width: 100%;
+      margin-bottom: 8px;
+    }
+    
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .btn-primary {
+      background: rgba(255, 255, 255, 0.3);
+      font-weight: 600;
+    }
+    
+    .status {
+      text-align: center;
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      margin-bottom: 10px;
+    }
+    
+    .status.active {
+      background: rgba(76, 175, 80, 0.3);
+    }
+    
+    .status.waiting {
+      background: rgba(255, 193, 7, 0.3);
+    }
+    
+    .row {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .row .form-group {
+      flex: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="header" id="popupHeader">
+    <h1>🚄 IRCTC Booking Supporter</h1>
+    <p>Tatkal speed + Normal booking ease</p>
+  </div>
+  
+  <div id="status" class="status" style="display: none;"></div>
+  
+  <div class="section">
+    <h3>⚡ Booking Mode</h3>
+    <div class="form-group">
+      <label>Booking Type</label>
+      <select id="bookingMode">
+        <option value="tatkal">🚀 Tatkal</option>
+        <option value="normal">🎯 General</option>
+      </select>
+    </div>
+    <div id="tatkalInfo" class="form-group" style="font-size: 11px; opacity: 0.8; margin-top: 8px;">
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>🎯 Journey Details</h3>
+    <div class="row">
+      <div class="form-group">
+        <label>From Station (City Code) <span class="required">*</span></label>
+        <input type="text" id="fromStation" placeholder="e.g., NDLS, ST, PUNE">
+      </div>
+      <div class="form-group">
+        <label>To Station (City Code) <span class="required">*</span></label>
+        <input type="text" id="toStation" placeholder="e.g., BCT, MUMBAI, DEL">
+      </div>
+    </div>
+    <div class="row">
+      <div class="form-group">
+        <label>Travel Date <span class="required">*</span></label>
+        <input type="date" id="travelDate">
+      </div>
+      <div class="form-group">
+        <label>Class <span class="required">*</span></label>
+        <select id="travelClass">
+          <option value="3A" selected>3A</option>
+          <option value="2A">2A</option>
+          <option value="1A">1A</option>
+          <option value="SL">SL</option>
+          <option value="CC">CC</option>
+          <option value="EC">EC</option>
+          <option value="2S">2S</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Preferred Train <span class="required">*</span></label>
+      <input type="text" id="trainPreference" placeholder="Train name or number (e.g., 12002)">
+    </div>
+    <div class="form-group">
+      <label>Payment Mode</label>
+      <select id="paymentMode">
+        <option value="UPI">BHIM/UPI (₹20 + GST)</option>
+        <option value="CARD">Credit/Debit/Net Banking (₹30 + GST)</option>
+      </select>
+    </div>
+  </div>
+  
+  <div class="section">
+    <h3>📱 Contact Details</h3>
+    <div class="form-group">
+      <label>Mobile Number <span class="required">*</span></label>
+      <input type="tel" id="mobileNumber" placeholder="10-digit mobile number" maxlength="10">
+    </div>
+  </div>
+  
+  <div class="section">
+    <h3>👥 Passengers</h3>
+    <div id="passengerList"></div>
+    <button class="btn" id="addPassenger">+ Add Passenger</button>
+  </div>
+  
+  <div class="section">
+    <h3>⚡ Actions</h3>
+    <button class="btn btn-primary" id="startBooking">🚀 Start Smart Booking</button>
+    
+    <div class="form-group">
+      <label>Configuration Label</label>
+      <input type="text" id="configLabel" placeholder="e.g., Home to Office, Mumbai Trip">
+    </div>
+    <button class="btn" id="saveConfig">💾 Save Configuration</button>
+    
+    <div class="form-group">
+      <label>Load Configuration</label>
+      <select id="configSelector">
+        <option value="">Select a saved configuration...</option>
+      </select>
+    </div>
+    <button class="btn" id="loadConfig">📂 Load Selected Configuration</button>
+    <button class="btn" id="deleteConfig" style="background: rgba(245, 101, 101, 0.3);">🗑️ Delete Selected Configuration</button>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
