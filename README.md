@@ -23,24 +23,24 @@ This Chrome extension assists with IRCTC train booking by:
 
 Watch a live demonstration of the extension in action during a sample Tatkal booking process:
 
-<video src="tatkal-booking-demo.mp4" controls width="600">
-  Your browser does not support the video tag. <a href="tatkal-booking-demo.mp4">Click here to download the demo video</a>.
-</video>
+
+[▶️ Watch the demo video (tatkal-booking-demo.mp4)](tatkal-booking-demo.mp4)
 
 *The video shows the complete automation process from form filling to the CAPTCHA step, demonstrating the speed and efficiency gains during Tatkal booking.*
 
 ## 📁 File Structure & Purpose
 
 ```
-irctc-booking-supporter/
-├── manifest.json          # Extension configuration and permissions
-├── popup.html             # Extension popup interface
-├── popup.js               # Handles user input and configuration
-├── content.js             # Main automation engine that works on IRCTC pages
-├── background.js          # Extension service worker for background tasks
+/
 ├── LICENSE                # CC BY-NC License
 ├── README.md              # This documentation
-└── tatkal-booking-demo.mp4  # Video demonstration of Tatkal booking process
+├── tatkal-booking-demo.mp4  # Video demonstration of Tatkal booking process
+└── irctc-booking-supporter/
+    ├── manifest.json          # Extension configuration and permissions
+    ├── popup.html             # Extension popup interface
+    ├── popup.js               # Handles user input and configuration
+    ├── content.js             # Main automation engine that works on IRCTC pages
+    └── background.js          # Extension service worker for background tasks
 ```
 
 ### File Descriptions
