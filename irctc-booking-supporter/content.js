@@ -420,7 +420,22 @@ class IRCTCAutomation {
           
           if (bookNowButton) {
             console.log('✅ Found Book Now button, clicking...');
+            
+            // Strategic delay for Tatkal to avoid server-side bot detection
+            if (this.isTatkalMode) {
+              console.log('🕐 Tatkal mode: Adding strategic delay before Book Now...');
+              await this.sleep(500 + Math.floor(Math.random() * 1000)); // 0.5-1.5s delay
+            }
+            
+            // Add timing instrumentation for Tatkal performance analysis
+            const clickTimestamp = Date.now();
+            console.time('⏱️ BookNow → PassengerPage');
+            
             await this.clickElement(bookNowButton);
+            
+            // Monitor for next page load to measure server response time
+            this.monitorPageTransition(clickTimestamp, 'BookNow');
+            
             await this.waitForPassengerPage();
           } else {
             this.showStatus('Book Now button not found after 45 seconds. Please check manually.');
@@ -559,8 +574,23 @@ class IRCTCAutomation {
       // Click Continue
       const continueButton = await this.findElement('button.train_Search');
       if (continueButton) {
+        // Strategic delay for Tatkal to avoid server-side bot detection
+        if (this.isTatkalMode) {
+          console.log('🕐 Tatkal mode: Adding strategic delay before Continue...');
+          await this.sleep(800 + Math.floor(Math.random() * 1200)); // 0.8-2s delay
+        }
+        
+        // Add timing for critical Continue button click
+        const clickTimestamp = Date.now();
+        console.time('⏱️ Continue → CaptchaPage');
+        console.log('🎯 Clicking Continue button - monitoring server response time...');
+        
         this.showStatus('Proceeding to captcha...', true);
         await this.clickElement(continueButton);
+        
+        // Monitor for captcha page load
+        this.monitorPageTransition(clickTimestamp, 'Continue');
+        
         await this.waitForCaptchaPage();
       }
     } catch (error) {
@@ -694,21 +724,111 @@ class IRCTCAutomation {
 
   async clickElement(element) {
     if (!element) return;
+    
+    // Smooth scroll with human-like delay
     element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    await this.sleep(100);
-    element.focus();
-    element.click();
-    await this.sleep(100);
+    await this.sleep(50 + Math.floor(Math.random() * 100)); // 50-150ms random
+    
+    // Focus first
+    try { element.focus(); } catch (e) {}
+    
+    // Simulate realistic mouse events sequence
+    const rect = element.getBoundingClientRect();
+    const clientX = rect.left + rect.width / 2 + (Math.random() - 0.5) * 10; // slight offset
+    const clientY = rect.top + rect.height / 2 + (Math.random() - 0.5) * 10;
+    
+    const mouseInit = { 
+      bubbles: true, 
+      cancelable: true, 
+      view: window, 
+      clientX, 
+      clientY 
+    };
+    
+    // Mouse event sequence: move -> down -> up -> click
+    element.dispatchEvent(new MouseEvent('mousemove', mouseInit));
+    await this.sleep(20 + Math.floor(Math.random() * 60)); // 20-80ms
+    
+    element.dispatchEvent(new MouseEvent('mousedown', mouseInit));
+    await this.sleep(30 + Math.floor(Math.random() * 70)); // 30-100ms
+    
+    element.dispatchEvent(new MouseEvent('mouseup', mouseInit));
+    await this.sleep(10 + Math.floor(Math.random() * 40)); // 10-50ms
+    
+    element.dispatchEvent(new MouseEvent('click', mouseInit));
+    
+    // Variable delay after click
+    await this.sleep(80 + Math.floor(Math.random() * 160)); // 80-240ms
   }
 
   async fillInput(element, text) {
-    if (!element || !text) return;
+    if (!element || text == null) return;
+    
     element.focus();
+    
+    // Clear existing value more naturally
+    if (element.value) {
+      element.select(); // Select all text first
+      await this.sleep(20 + Math.floor(Math.random() * 30));
+    }
+    
     element.value = '';
-    element.value = text;
     element.dispatchEvent(new Event('input', { bubbles: true }));
+    
+    if (typeof text !== 'string') text = String(text);
+    
+    // Use human-like typing for Tatkal mode or longer text
+    const shouldTypeCharByChar = this.isTatkalMode || text.length > 3;
+    
+    if (shouldTypeCharByChar) {
+      // Character-by-character typing with realistic delays
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        element.value += char;
+        
+        // Dispatch realistic keyboard events
+        element.dispatchEvent(new KeyboardEvent('keydown', { 
+          bubbles: true, 
+          key: char,
+          code: `Key${char.toUpperCase()}`,
+          keyCode: char.charCodeAt(0)
+        }));
+        
+        element.dispatchEvent(new InputEvent('input', { 
+          bubbles: true, 
+          data: char,
+          inputType: 'insertText'
+        }));
+        
+        element.dispatchEvent(new KeyboardEvent('keyup', { 
+          bubbles: true, 
+          key: char,
+          code: `Key${char.toUpperCase()}`,
+          keyCode: char.charCodeAt(0)
+        }));
+        
+        // Variable typing speed: 50-150ms per character (realistic human typing)
+        const delay = 50 + Math.floor(Math.random() * 100);
+        
+        // Occasionally pause longer (like humans thinking)
+        const pauseChance = Math.random();
+        if (pauseChance < 0.1) { // 10% chance
+          await this.sleep(delay + 100 + Math.floor(Math.random() * 200)); // Extra pause
+        } else {
+          await this.sleep(delay);
+        }
+      }
+    } else {
+      // For short text, fill directly but still emit events
+      element.value = text;
+      element.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    
+    // Final change event
     element.dispatchEvent(new Event('change', { bubbles: true }));
-    await this.sleep(200);
+    
+    // Variable delay after filling
+    await this.sleep(100 + Math.floor(Math.random() * 150)); // 100-250ms
   }
 
   async selectOption(selectElement, value) {
@@ -748,6 +868,42 @@ class IRCTCAutomation {
         break;
       }
     }
+  }
+
+  // Monitor page transitions to measure server response times during Tatkal
+  monitorPageTransition(clickTimestamp, actionName) {
+    const checkInterval = 100; // Check every 100ms
+    let checks = 0;
+    const maxChecks = 300; // Max 30 seconds
+    
+    const monitor = setInterval(() => {
+      checks++;
+      
+      // Check for page change indicators
+      const hasNewContent = document.querySelector('[data-captcha]') || 
+                           document.querySelector('.captcha') ||
+                           document.querySelector('#nlpCaptchaImg') ||
+                           document.readyState === 'loading';
+      
+      if (hasNewContent || checks >= maxChecks) {
+        const responseTime = Date.now() - clickTimestamp;
+        console.timeEnd(`⏱️ ${actionName} → ${hasNewContent ? 'NextPage' : 'Timeout'}`);
+        
+        if (this.isTatkalMode) {
+          console.log(`🏃‍♂️ TATKAL Response Time: ${responseTime}ms for ${actionName}`);
+          
+          if (responseTime > 5000) {
+            console.warn(`⚠️ Slow server response (${responseTime}ms) - typical during Tatkal peak hours`);
+          } else {
+            console.log(`✅ Good response time for Tatkal booking`);
+          }
+        } else {
+          console.log(`📊 Response Time: ${responseTime}ms for ${actionName}`);
+        }
+        
+        clearInterval(monitor);
+      }
+    }, checkInterval);
   }
 
   async navigateToCorrectMonth(targetMonth, targetYear) {
