@@ -55,7 +55,7 @@ Watch a live demonstration of the extension in action during a sample Tatkal boo
 
 1. **Download/Clone the Project**:
    ```bash
-   git clone https://github.com/your-username/irctc-booking-supporter.git
+   git clone https://github.com/tsh-03/irctc-booking-supporter.git
    ```
 
 2. **Load Extension in Chrome**:
