@@ -259,7 +259,7 @@ class IRCTCAutomation {
     this.showStatus('Filling search form...');
     
     try {
-      await this.sleep(800);
+      await this.sleep(100);
       
       // Fill From Station
       const fromInput = await this.findElement('#origin input');
@@ -286,7 +286,7 @@ class IRCTCAutomation {
       const quotaDropdown = await this.findElement('form > div:nth-of-type(3) div.ui-dropdown-trigger > span');
       if (quotaDropdown) {
         await this.clickElement(quotaDropdown);
-        await this.sleep(500);
+        await this.sleep(100);
         
         // Try multiple selectors for quota options
         const quotaText = this.isTatkalMode ? 'TATKAL' : 'GENERAL';
@@ -534,7 +534,7 @@ class IRCTCAutomation {
     this.showStatus('Filling passenger details...', true);
     
     try {
-      await this.sleep(1000);
+      await this.sleep(100);
       
       for (let i = 0; i < this.config.passengers.length; i++) {
         const passenger = this.config.passengers[i];
@@ -733,7 +733,7 @@ class IRCTCAutomation {
   }
 
   async selectDate() {
-    await this.sleep(500);
+    await this.sleep(100);
     const targetDate = new Date(this.config.journey.date);
     const targetMonth = targetDate.getMonth();
     const targetYear = targetDate.getFullYear();
@@ -741,7 +741,6 @@ class IRCTCAutomation {
     
     await this.navigateToCorrectMonth(targetMonth, targetYear);
     
-    await this.sleep(300);
     const dateElements = document.querySelectorAll('.ui-datepicker-calendar td a');
     for (const el of dateElements) {
       if (el.textContent.trim() === targetDay.toString()) {
